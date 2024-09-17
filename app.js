@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	placeApple();
 	updateSnakeVisual();
 	PlayerMove();
-	spawnEnemy();
+	//spawnEnemy();
 
 
 	// a chaque pression d'une touche, on vérifie si le serpent peut se déplacer, on prend en compte 
@@ -216,6 +216,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
 		const newBodyPart = document.createElement('div');
 		newBodyPart.classList.add('player_bodypart');
+
+		newBodyPart.style.left = `${lastPart.x}px`;
+		newBodyPart.style.top = `${lastPart.y}px`;
 		gameBoard.appendChild(newBodyPart);
 		bodyElements.push(newBodyPart);
 	}
@@ -468,8 +471,8 @@ document.addEventListener('DOMContentLoaded', () => {
 		newEnemy.id = `enemy_${Date.now()}`;
 		gameBoard.appendChild(newEnemy);
 
-		let enemyX = Math.floor(Math.random() * bordWidth - 50);
-		let enemyY = Math.floor(Math.random() * bordHeight - 50);
+		let enemyX = Math.floor(Math.random() * bordWidth - 100);
+		let enemyY = Math.floor(Math.random() * bordHeight - 100);
 
 		newEnemy.style.left = `${enemyX}px`;
 		newEnemy.style.top = `${enemyY}px`;
