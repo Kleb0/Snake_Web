@@ -28,10 +28,10 @@ body{
 	box-shadow: 0 5px 30px rgba(0, 0, 0, 0.8);
 	padding: 30px;
 	width: 1200px;
-	height: 150px;
+	height: 300px;
 	display: flex;
 	flex-direction: row;
-	justify-content: space-between;
+	justify-content: left;
 	align-items: center;
 	position: relative;
 	top: 30px;
@@ -39,29 +39,59 @@ body{
 }
 
 .header h1{
-	font-size: 30px;
+	font-size: 65px;
 	position: relative;
-	justify-content: center;
-	left: 40%;
+	left: 25%;
+	text-align: center;
+
+
 }
 
 .header p{
 	font-size: 30px;
-	position: relative;
 	right: 20px;
 }
 
+.Time_Left_Objectives p{
+	font-size: 25px;
+	left: 10px;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	gap: 40px;
+}
+
+#Survival_Mode{
+	background-color: #03b62d; 
+	color: white;           
+	padding: 15px 32px;      
+	font-size: 25px;          
+	border: none;              
+	border-radius: 8px;        
+	cursor: pointer;          
+
+
+}
+#Survival_Mode:hover{
+	background-color: #ff0000;
+}
+
+
 .Score p{
-	font-size: 20px;
+	font-size: 22px;
 	position: relative;
 	right: 20px;
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
 	align-items: center;
+	margin-left: 500px;
 	gap: 30px;
 
 }
+
+
 
 .game_board{
 	background-color: #deac7d;
@@ -149,4 +179,20 @@ body{
 	height: 25px;
 	position: absolute;
 	opacity: 0;
+}
+
+.Victory{
+	position: absolute;
+	color: green;
+	font-size: 50px;
+	font-weight: bold;
+	visibility: hidden;
+}
+
+.Defeat{
+	position: absolute;
+	color: red;
+	font-size: 50px;
+	font-weight: bold;
+	visibility: hidden;
 }
