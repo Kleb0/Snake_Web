@@ -5,7 +5,7 @@ class Enemy
 		console.log('Enemy created');
 		this.gameBoard = gameBoard;
 		this.player = player;
-		this.isAlive = true;
+		this.hasBeenSpawned = true;
 
 
 		this.enemyElement = document.createElement('div');
@@ -79,7 +79,7 @@ class Enemy
 		const projectileSpeed = 3;
 
 		const moveProjectile = () => {
-			if(!this.isAlive)
+			if(!this.hasBeenSpawned)
 			{
 				projectile.remove();
 				return;
@@ -93,12 +93,13 @@ class Enemy
 
 			if(this.checkCollisionWithSnake(projectileX, projectileY))
 			{
-				projectile.style.opacity = 0;
-				this.player.destroyLastSnakePart();
-				projectile.remove();
-				return;
 
+				projectile.remove();
+				this.player.destroyLastSnakePart();
+				this.player.updateSnakePartScoreCallback();
+				return;
 			}
+
 			if (projectileX < 0 || projectileX > this.gameBoard.clientWidth || projectileY < 0 || projectileY > this.gameBoard.clientHeight)
 			{
 				projectile.remove();
@@ -107,6 +108,7 @@ class Enemy
 			}	
 			else
 			{
+				this.checkCollisionWithSnake(projectileX, projectileY);
 				requestAnimationFrame(moveProjectile);
 			}
 		};
@@ -116,15 +118,17 @@ class Enemy
 
 	checkCollisionWithSnake(projectileX, projectileY)
 	{
-		const toleranceThreshold = 10;
+
+		const toleranceThreshold = 50;
 
 		for (let i = 0; i < this.player.snakeParts.length; i++)
 		{
 			const part = this.player.snakeParts[i];
 
-			if (Math.abs(projectileX - part.x) < toleranceThreshold.Threshold && 
+			if (Math.abs(projectileX - part.x) < toleranceThreshold && 
 				Math.abs(projectileY - part.y) < toleranceThreshold)
 			{
+
 				return true;
 			}
 		}
@@ -133,12 +137,28 @@ class Enemy
 
 	killEnemy()
 	{
-		this.isAlive = false;
+
+		//One the enemy is killed we need to remove it, but the main class need to recreate it
+		//so we will use a personnalised event to notify the main class
+
+		const event = new CustomEvent('enemyKilled', {
+			detail :{
+				message: 'Enemy has been killed',
+				time: new Date()
+			}
+		});
+
+		document.dispatchEvent(event);
 		clearInterval(this.shootingInterval);
-		this.enemyElement.remove();
+		this.enemyElement.remove();		
 	}
 
-
+	unSpawnEnemy()
+	{
+		this.hasBeenSpawned = false;
+		clearInterval(this.shootingInterval);
+		this.enemyElement.remove(); 
+	}
 
 }
 

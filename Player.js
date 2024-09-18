@@ -4,15 +4,16 @@
 class Player
 {
 	
-	constructor(gameBoard, posX, posY, moveDistance, currentDirection, laser, apple,
-	updateScoreCallBack, updateSnakePartScoreCallback )
+	constructor(gameBoard, posX, posY, moveDistance, currentDirection, apple,
+	updateScoreCallBack, updateSnakePartScoreCallback, updateKillScoreCallback )
 	{
 
 		console.log('Player created');
+		this.currentEnemy = null;
 		this.gameBoard = gameBoard;
 		this.headElement = document.querySelector('.player');
 		this.bodyElements = [];
-		this.snakeParts = [{x: 350, y:350}];
+		this.snakeParts = [{x: posX, y:posY}];
 		this.moveDistance = 50;
 		this.currentDirection = 'right';
 		this.laserSpeed = 10;
@@ -21,14 +22,15 @@ class Player
 		this.moveDistance = moveDistance;
 		this.currentDirection = currentDirection;
 		this.apple = apple;
-		this.laser = laser;
 		this.updateScoreCallBack = updateScoreCallBack;
 		this.updateSnakePartScoreCallback = updateSnakePartScoreCallback;
+		this.updateKillScoreCallback = updateKillScoreCallback;
 		this.isSurvivalMode = false;
 
 		//we will initialize the body parts of the snake
 		this.initBodyParts();
 		this.updateSnakeVisual();
+	
 
 	}
 
@@ -40,7 +42,7 @@ class Player
 			if(body)
 			{
 				this.bodyElements.push(body);
-				this.snakeParts.push({x: 350 - i * this.moveDistance, y: 350});
+				this.snakeParts.push({x: this.posX - i * this.moveDistance, y: this.posY});
 			}
 		}
 	}
@@ -93,7 +95,11 @@ class Player
 						this.currentDirection = 'right';
 						moved = true;
 					}
-					break;			
+					break;
+				case 'x':
+					console.log('space bar pressed laser shot');
+					this.laserShot();
+					break;				
 		
 			}
 			if (moved)
@@ -116,9 +122,6 @@ class Player
 					{
 						this.updateSnakePartScoreCallback();
 					}
-
-					// let newApple = new Apple(this.gameBoard);
-					// this.apple = newApple;
 
 				}
 			}	
@@ -198,15 +201,14 @@ class Player
 	laserShot()
 	{
 		//first we will create a laser element that we will spawn from the head of the player
-		console.log('laser shot');
 		const laser = document.createElement('div');
 		laser.classList.add('laser');
-		this.gameBoard.boardElement.appendChild(laser);
+		this.gameBoard.appendChild(laser);
 
 		let laserX = this.snakeParts[0].x;
 		let laserY = this.snakeParts[0].y;
-		laser.style.left = '${laserX}px';
-		laser.style.top = '${laserY}px';
+		laser.style.left = `${laserX}px`;
+		laser.style.top = `${laserY}px`;
 		laser.style.opacity = 1;
 
 		const laserDirection = this.currentDirection;
@@ -232,7 +234,13 @@ class Player
 					break;			
 			}
 
-			if (laserX < 0 || laserX > this.gameBoard.width || laserY < 0 || laserY > this.gameBoard.height)
+			laser.style.left = `${laserX}px`;
+			laser.style.top = `${laserY}px`;
+
+			if (laserX < 0 || 
+				laserX > this.gameBoard.clientWidth || 
+				laserY < 0 
+				|| laserY > this.gameBoard.clientHeight)
 			{
 				laser.remove();
 				
@@ -241,9 +249,22 @@ class Player
 			{
 				requestAnimationFrame(moveLaser);
 			}
-		};
-		requestAnimationFrame(moveLaser);
+			if (this.checkCollsionWithEnemy(laserX, laserY))
+			{
+				console.log('collision with enemy');
+				laser.remove();
+				this.currentEnemy.killEnemy();
 
+				if(this.updateKillScoreCallback)
+				{
+					this.updateKillScoreCallback();
+				}
+
+				return;
+			}
+		};
+
+		requestAnimationFrame(moveLaser);
 	}
 
 	growSnake()
@@ -269,6 +290,16 @@ class Player
 			this.snakeParts.pop();
 			const lastBodyPart = this.bodyElements.pop();
 			lastBodyPart.remove();
+
+			const event = new CustomEvent('SerpentLostPart', {
+				detail :{
+					message: 'Serpent has lost part decrease total score by 2',
+					time: new Date()
+				}
+			});
+
+			document.dispatchEvent(event);
+	
 		}
 
 	}
@@ -294,23 +325,23 @@ class Player
 		return false;
 	}
 
-	checkCollisionWithEnemyProjectile(projectileX, projectileY)
+	checkCollsionWithEnemy(laserX, laserY)
 	{
-		const toleranceThreshold = 10;
+		const enemyX = parseInt(this.currentEnemy.enemyElement.style.left, 10);
+		const enemyY = parseInt(this.currentEnemy.enemyElement.style.top, 10);
+		const toleranceThreshold = 50;
 
-		for(let i = 0; i < this.snakeParts.length; i++)
+		if (Math.abs(laserX - enemyX) < toleranceThreshold &&
+			Math.abs(laserY - enemyY) < toleranceThreshold)
 		{
-			const part = this.snakeParts[i];
-
-			if (Math.abs(proejctileX - part.x) < toleranceThreshold &&
-				Math.abs(proejctileY - part.y) < toleranceThreshold)
-			{
-				return true;
-			}
-			return false;
+			return true;
 		}
+		return false;
 	}
 
-
+	spawnEnemy()
+	{
+		this.currentEnemy = new Enemy(this.gameBoard, this);
+	}
 }
 export default Player;
