@@ -59,6 +59,8 @@ class Player
 				case 'z' :
 					if(this.posY - this.moveDistance >= 0)
 					{
+						
+						this.headElement.style.transform = 'scale(2.5) rotate(180deg)'; 
 						// console.log('up');
 						this.posY -= this.moveDistance;
 						this.currentDirection = 'up';
@@ -71,6 +73,7 @@ class Player
 					if(this.posY + this.moveDistance < this.gameBoard.clientHeight - 50)
 					{
 						// console.log('down');
+						this.headElement.style.transform = 'scale(2.5) rotate(0deg)'; 
 						this.posY += this.moveDistance;
 						this.currentDirection = 'down';
 						moved = true;
@@ -81,6 +84,7 @@ class Player
 					if(this.posX - this.moveDistance >= 0)
 					{
 						// console.log('left');
+						this.headElement.style.transform = 'scale(2.5) rotate(90deg)';
 						this.posX -= this.moveDistance;
 						this.currentDirection = 'left';
 						moved = true;
@@ -91,6 +95,7 @@ class Player
 					if(this.posX + this.moveDistance < this.gameBoard.clientWidth - 50)
 					{
 						// console.log('right');
+						this.headElement.style.transform = 'scale(2.5) rotate(270deg)';
 						this.posX += this.moveDistance;
 						this.currentDirection = 'right';
 						moved = true;
@@ -200,7 +205,9 @@ class Player
 
 	laserShot()
 	{
-		//first we will create a laser element that we will spawn from the head of the player
+		if(this.isSurvivalMode)
+		{
+			//first we will create a laser element that we will spawn from the head of the player
 		const laser = document.createElement('div');
 		laser.classList.add('laser');
 		this.gameBoard.appendChild(laser);
@@ -265,6 +272,9 @@ class Player
 		};
 
 		requestAnimationFrame(moveLaser);
+
+		}
+		
 	}
 
 	growSnake()

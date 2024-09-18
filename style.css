@@ -113,8 +113,12 @@ body{
 }
 
 .player{
-	background-color: #45e10c;
+	background-image: url('img/shenron.png');
+	background-size: cover;
+	background-repeat: no-repeat;
+	transform: scale(2.5) rotate(-90deg);
 	z-index: 2;
+	image-rendering: pixelated;
 }
 
 .player_body{
@@ -123,8 +127,11 @@ body{
 }
 
 .player_bodypart{
-	background-color: #2f00ff;
+	background-image: url('img/bodypart.png');
+	background-size: cover;
+	background-repeat: no-repeat;
 	z-index: 1;
+	image-rendering: pixelated;
 
 }
 
@@ -147,12 +154,17 @@ body{
 }
 
 .apple{
-	background-color: #da1212;
+	background-image: url('img/apple.png');
+	background-size: cover;
+	background-repeat: no-repeat;
 	border-radius: 10px;
 	width: 50px;
 	height: 50px;
 	/* Cela rend l'élément positionnalbe */
 	position: absolute;
+	z-index: 1;
+	image-rendering: pixelated;
+	transform: scale(1.5);
 }
 
 .laser{
@@ -165,12 +177,17 @@ body{
 }
 
 .enemy{
-	background-color: #18e8e8;
+	background-image: url('img/pilaf.png');
+	background-size: cover;
+	background-repeat: no-repeat;
+
 	border-radius: 10px;
 	width: 50px;
 	height: 50px;
 	position: absolute;
-
+	z-index: 1;
+	image-rendering: pixelated;
+	transform: scale(2.5);
 }
 .enemy_projectile{
 	background-color: #ffee00;
@@ -184,15 +201,21 @@ body{
 .Victory{
 	position: absolute;
 	color: green;
-	font-size: 50px;
+	font-size: 200px;
 	font-weight: bold;
 	visibility: hidden;
+	position: absolute;
+	margin-top: 400px;
+	z-index: 2;
 }
 
 .Defeat{
 	position: absolute;
 	color: red;
-	font-size: 50px;
+	font-size: 200px;
 	font-weight: bold;
 	visibility: hidden;
+	position: absolute;
+	margin-top: 400px;
+	z-index: 2;
 }

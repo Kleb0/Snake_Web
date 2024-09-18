@@ -7,8 +7,18 @@ document.addEventListener('DOMContentLoaded', () => {
 	//this part is still a bit messy
 	let isSurvivalMode = false;
 	let currentEnemy = null;
+	let timeLeft = 60;
+	let timeInterval = null;
+	const objectiveScore = parseInt(document.getElementById('Objective_Score').textContent);
+
+
 	const survivalModeButton = document.getElementById('Survival_Mode');
 	const survivalModeIndication = document.getElementById('Survival_Mode_Indication');
+	const timeLeftElement = document.getElementById('Time_Left');
+
+	const gameBoard = document.querySelector('.game_board');
+	const victoryElement = document.querySelector('.Victory');
+	const defeatElement = document.querySelector('.Defeat');
 
 	//first clean the DOM from any existing elements
 	const inialEnemy = document.querySelector('.enemy');
@@ -23,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		initialApple.remove();
 	}
 
-	const gameBoard = document.querySelector('.game_board');
+
 
 	const headDirection = {up: 'up', down: 'down', left: 'left', right : 'right'};
 	let currentDirection = headDirection.right;
@@ -56,6 +66,9 @@ document.addEventListener('DOMContentLoaded', () => {
 			survivalModeIndication.textContent = 'Yes';
 			survivalModeButton.style.backgroundColor = '#da1212';
 			spawnEnemy();
+			player.isSurvivalMode = true;
+			startSurvivalMode();
+
 
 		}
 		else
@@ -65,6 +78,26 @@ document.addEventListener('DOMContentLoaded', () => {
 			currentEnemy.unSpawnEnemy();
 		}
 	  });
+
+	  function startSurvivalMode()
+	  {
+		timeLeft = 60;
+		timeLeftElement.textContent = timeLeft;
+
+		timeInterval = setInterval(() => { 
+			timeLeft--;
+			timeLeftElement.textContent = timeLeft;
+
+			handleEndGame();
+
+			if (timeLeft <= 0){
+				clearInterval(timeInterval);
+				handleEndGame();
+
+			}
+		}, 1000);
+	  }
+
 
 	// ---------- Enemy Spawning Logic ------------
 
@@ -98,6 +131,9 @@ document.addEventListener('DOMContentLoaded', () => {
 		snakePartsElement.textContent = currentSnakeLength;
 
 	}
+	// when the snake loses a part, we update the score with an event listener which is triggered in the player class
+	// PlayerClass ----> Event ----> Main.js ----> Update the score
+
 	document.addEventListener('SerpentLostPart', (event) => {
 		console.log('----- SERPENT LOST PART SIGNAL RECEIVED -----');
 		console.log(event.detail.message);
@@ -126,11 +162,6 @@ document.addEventListener('DOMContentLoaded', () => {
 		
 	}
 
-	function DecreaseTime()
-	{
-
-	}
-
 	function updateTotalScore(value)
 	{
 		const scoreElement = document.getElementById('Total_Score');
@@ -138,4 +169,43 @@ document.addEventListener('DOMContentLoaded', () => {
 		score += value;
 		scoreElement.textContent = score;
 	}
+
+	function handleEndGame()
+	{
+		const snakePartsElement = document.getElementById('Snake_Parts');
+		const totalScoreElement = document.getElementById('Total_Score');
+		const currentSnakeParts = parseInt(snakePartsElement.textContent);
+		const currentTotalScore = parseInt(totalScoreElement.textContent);
+
+		if (currentSnakeParts <= 0)
+		{
+			handleDefeat("Your snake has no more parts");
+
+		}
+		if (currentTotalScore >= objectiveScore && timeLeft > 0)
+		{
+			handleVictory("You reached the objective score ! You win !");
+		}
+
+		if (timeLeft <= 0 && currentTotalScore < objectiveScore)
+		{
+			handleDefeat("You ran out of time and did not reach the objective score"); 
+		}
+
+	}
+
+	// ---------- Victory and Defeat ------------
+
+	function handleVictory(message)
+	{
+		victoryElement.style.visibility = 'visible';
+		alert(message);
+	}
+
+	function handleDefeat(message)
+	{
+		defeatElement.style.visibility = 'visible';
+		alert(message);
+	}
+
 });
