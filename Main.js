@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	let currentEnemy = null;
 	let timeLeft = 60;
 	let timeInterval = null;
+	let isGameOver = false;
 	const objectiveScore = parseInt(document.getElementById('Objective_Score').textContent);
 
 
@@ -59,24 +60,30 @@ document.addEventListener('DOMContentLoaded', () => {
 	// ---------- Survival Mode Logic ------------
 
 	survivalModeButton.addEventListener('click', () => {
-		isSurvivalMode = !isSurvivalMode;
 
-		if(isSurvivalMode)
+		if(isGameOver === false)
 		{
-			survivalModeIndication.textContent = 'Yes';
-			survivalModeButton.style.backgroundColor = '#da1212';
-			spawnEnemy();
-			player.isSurvivalMode = true;
-			startSurvivalMode();
+			isSurvivalMode = !isSurvivalMode;
 
+			if(isSurvivalMode)
+			{
+				survivalModeIndication.textContent = 'Yes';
+				survivalModeButton.style.backgroundColor = '#da1212';
+				spawnEnemy();
+				player.isSurvivalMode = true;
+				startSurvivalMode();
+	
+	
+			}
+			else
+			{
+				survivalModeIndication.textContent = 'No';
+				survivalModeButton.style.backgroundColor = '#45e10c';
+				currentEnemy.unSpawnEnemy();
+			}
 
 		}
-		else
-		{
-			survivalModeIndication.textContent = 'No';
-			survivalModeButton.style.backgroundColor = '#45e10c';
-			currentEnemy.unSpawnEnemy();
-		}
+	
 	  });
 
 	  function startSurvivalMode()
@@ -84,18 +91,26 @@ document.addEventListener('DOMContentLoaded', () => {
 		timeLeft = 60;
 		timeLeftElement.textContent = timeLeft;
 
-		timeInterval = setInterval(() => { 
-			timeLeft--;
-			timeLeftElement.textContent = timeLeft;
-
-			handleEndGame();
-
-			if (timeLeft <= 0){
-				clearInterval(timeInterval);
+		if(isGameOver === false)
+		{
+			timeInterval = setInterval(() => { 
+				timeLeft--;
+				timeLeftElement.textContent = timeLeft;
+	
 				handleEndGame();
-
-			}
-		}, 1000);
+	
+				if (timeLeft <= 0){
+					clearInterval(timeInterval);
+					handleEndGame();
+	
+				}
+			}, 1000);
+		}
+		else
+		{
+			clearInterval(timeInterval);
+		}
+		
 	  }
 
 
@@ -111,8 +126,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	function spawnEnemy()
 	{
-		currentEnemy = new Enemy(gameBoard, player);
-		player.currentEnemy = currentEnemy;
+		if(isGameOver === false)
+		{
+			currentEnemy = new Enemy(gameBoard, player);
+			player.currentEnemy = currentEnemy;
+
+		}
+
 	}
 
 	document.addEventListener('enemyKilled', (event) => {
@@ -168,6 +188,11 @@ document.addEventListener('DOMContentLoaded', () => {
 		let score = parseInt(scoreElement.textContent);
 		score += value;
 		scoreElement.textContent = score;
+
+		if (score >= objectiveScore)
+		{
+			handleVictory("You reached the objective score ! You win !");
+		}
 	}
 
 	function handleEndGame()
@@ -196,16 +221,42 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	// ---------- Victory and Defeat ------------
 
+	document.addEventListener('touchItself', (event) => {
+		console.log('----- SERPENT TOUCH ITSELF PART SIGNAL RECEIVED -----');
+		console.log(event.detail.message);
+		handleDefeat('Your snake touched itself');
+
+	})
+
 	function handleVictory(message)
 	{
-		victoryElement.style.visibility = 'visible';
-		alert(message);
+		if(isGameOver === false )
+		{
+
+			clearInterval(timeInterval);
+			alert(message);
+			victoryElement.style.visibility = 'visible';
+			isGameOver = true;
+			player.isGameOver = true;
+			currentEnemy.isGameOver = true;
+
+		}
+
+		//alert(message);
 	}
 
 	function handleDefeat(message)
 	{
-		defeatElement.style.visibility = 'visible';
-		alert(message);
-	}
+		if (isGameOver === false)
+		{
+			clearInterval(timeInterval);
+			alert(message);
+			defeatElement.style.visibility = 'visible';
+			isGameOver = true;
+			player.isGameOver = true;
+			currentEnemy.isGameOver = true;
+		}
+		}
+
 
 });

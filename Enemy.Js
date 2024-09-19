@@ -6,6 +6,7 @@ class Enemy
 		this.gameBoard = gameBoard;
 		this.player = player;
 		this.hasBeenSpawned = true;
+		this.isGameOver = false;
 
 
 		this.enemyElement = document.createElement('div');
@@ -22,10 +23,22 @@ class Enemy
 
 		this.moveEnemy();
 		this.shootingInterval = setInterval(() => this.enemyShoot(), 2000);
+
+
+
 	}
 
 	moveEnemy()
 	{
+
+		if(this.isGameOver)
+		{
+	
+			this.enemySpeed = 0;
+			return;
+
+		} 
+
 		let directionX = (Math.random() > 0.5) ? 1 : -1;
 		let directionY = (Math.random() > 0.5) ? 1 : -1;
 
@@ -55,6 +68,12 @@ class Enemy
 
 	enemyShoot()
 	{
+		if(this.isGameOver)
+		{
+			this.enemySpeed = 0;
+			return;
+		}
+
 		const projectile = document.createElement('div');
 		projectile.classList.add('enemy_projectile');
 		this.gameBoard.appendChild(projectile);

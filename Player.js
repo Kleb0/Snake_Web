@@ -26,6 +26,7 @@ class Player
 		this.updateSnakePartScoreCallback = updateSnakePartScoreCallback;
 		this.updateKillScoreCallback = updateKillScoreCallback;
 		this.isSurvivalMode = false;
+		this.isGameOver = false;
 
 		//we will initialize the body parts of the snake
 		this.initBodyParts();
@@ -48,89 +49,96 @@ class Player
 	}
 	setupMovement()
 	{
-		
+
 		document.addEventListener('keydown', (event ) =>
-		{
-
-			let moved = false;
-			switch(event.key)
 			{
-				case 'ArrowUp':
-				case 'z' :
-					if(this.posY - this.moveDistance >= 0)
-					{
-						
-						this.headElement.style.transform = 'scale(2.5) rotate(180deg)'; 
-						// console.log('up');
-						this.posY -= this.moveDistance;
-						this.currentDirection = 'up';
-						moved = true;
-					}
-					break;
 
-				case 'ArrowDown':
-				case 's':
-					if(this.posY + this.moveDistance < this.gameBoard.clientHeight - 50)
-					{
-						// console.log('down');
-						this.headElement.style.transform = 'scale(2.5) rotate(0deg)'; 
-						this.posY += this.moveDistance;
-						this.currentDirection = 'down';
-						moved = true;
-					}
-					break;
-				case 'ArrowLeft':
-				case 'q':
-					if(this.posX - this.moveDistance >= 0)
-					{
-						// console.log('left');
-						this.headElement.style.transform = 'scale(2.5) rotate(90deg)';
-						this.posX -= this.moveDistance;
-						this.currentDirection = 'left';
-						moved = true;
-					}
-					break;
-				case 'ArrowRight':
-				case 'd':
-					if(this.posX + this.moveDistance < this.gameBoard.clientWidth - 50)
-					{
-						// console.log('right');
-						this.headElement.style.transform = 'scale(2.5) rotate(270deg)';
-						this.posX += this.moveDistance;
-						this.currentDirection = 'right';
-						moved = true;
-					}
-					break;
-				case 'x':
-					console.log('space bar pressed laser shot');
-					this.laserShot();
-					break;				
-		
-			}
-			if (moved)
-			{
-				this.simulateSnake();
-				this.updateSnakeVisual();
-
-				if(this.checkAppleCollision(this.apple))
+				let moved = false;
+				switch(event.key)
 				{
-					console.log('collision');
-					this.apple.placeApple();
-					this.growSnake();
-
-					if(this.updateScoreCallBack)
-					{
-						this.updateScoreCallBack();
-					}
-
-					if (this.updateSnakePartScoreCallback)
-					{
-						this.updateSnakePartScoreCallback();
-					}
-
+					case 'ArrowUp':
+					case 'z' :
+						if(this.posY - this.moveDistance >= 0 && this.isGameOver === false)
+						{
+							
+							this.headElement.style.transform = 'scale(2.5) rotate(180deg)'; 
+							// console.log('up');
+							this.posY -= this.moveDistance;
+							this.currentDirection = 'up';
+							moved = true;
+						}
+						break;
+	
+					case 'ArrowDown':
+					case 's':
+						if(this.posY + this.moveDistance < this.gameBoard.clientHeight - 50 && this.isGameOver === false)
+						{
+							// console.log('down');
+							this.headElement.style.transform = 'scale(2.5) rotate(0deg)'; 
+							this.posY += this.moveDistance;
+							this.currentDirection = 'down';
+							moved = true;
+						}
+						break;
+					case 'ArrowLeft':
+					case 'q':
+						if(this.posX - this.moveDistance >= 0 && this.isGameOver === false)
+						{
+							// console.log('left');
+							this.headElement.style.transform = 'scale(2.5) rotate(90deg)';
+							this.posX -= this.moveDistance;
+							this.currentDirection = 'left';
+							moved = true;
+						}
+						break;
+					case 'ArrowRight':
+					case 'd':
+						if(this.posX + this.moveDistance < this.gameBoard.clientWidth - 50 && this.isGameOver === false)
+						{
+							// console.log('right');
+							this.headElement.style.transform = 'scale(2.5) rotate(270deg)';
+							this.posX += this.moveDistance;
+							this.currentDirection = 'right';
+							moved = true;
+						}
+						break;
+					case 'x':
+						console.log('space bar pressed laser shot');
+						this.laserShot();
+						break;				
+			
 				}
-			}	
-		});
+				if (moved)
+				{
+					this.simulateSnake();
+					this.updateSnakeVisual();
+	
+					if(this.checkAppleCollision(this.apple))
+					{
+						console.log('collision');
+						this.apple.placeApple();
+						this.growSnake();
+	
+						if(this.updateScoreCallBack)
+						{
+							this.updateScoreCallBack();
+						}
+	
+						if (this.updateSnakePartScoreCallback)
+						{
+							this.updateSnakePartScoreCallback();
+						}
+	
+					}
+					if(this.checkIfCollideWithItself())
+					{
+						this.callDefeat();
+						return;
+					}
+				}	
+			});	
+
+		
 	}
 
 	moveUp()
@@ -205,6 +213,8 @@ class Player
 
 	laserShot()
 	{
+		if(this.isGameOver) return;
+
 		if(this.isSurvivalMode)
 		{
 			//first we will create a laser element that we will spawn from the head of the player
@@ -347,6 +357,38 @@ class Player
 			return true;
 		}
 		return false;
+	}
+	checkIfCollideWithItself()
+	{
+		const headX = this.snakeParts[0].x;
+		const headY = this.snakeParts[0].y;
+		const toleranceThreshold = 25;
+
+		for(let i =1; i < this.snakeParts.length; i++)
+		{
+			const bodyPartX = this.snakeParts[i].x;
+			const bodyPartY = this.snakeParts[i].y;
+
+			if(Math.abs(headX - bodyPartX) < toleranceThreshold &&
+				Math.abs(headY - bodyPartY) < toleranceThreshold)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	callDefeat()
+	{
+		const event = new CustomEvent('touchItself', {
+			detail :{
+				message: 'Game Over !!! You have collided with yourself you lose',
+				time: new Date()
+			}
+		});
+
+		document.dispatchEvent(event);
+
 	}
 
 	spawnEnemy()
