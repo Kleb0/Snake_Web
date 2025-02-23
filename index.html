@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 	<head>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,12 +9,18 @@
 	<body>
 		<div class="container">
 			<div class = "header">
-				<h1>Classic Snake</h1>
+				<div class="Time_Left_Objectives">
+					<p>Time Left : <span id="Time_Left">60</span></p>
+					<p>Objective score : <span id="Objective_Score">5</span></p>
+					<p>Is Survival Mode : <span id="Survival_Mode_Indication">No</span></p>
+					<button id="Survival_Mode">Survival Mode</button>
+				</div>
+				<h1>Survival Snake</h1>
 				<div class="Score">
-					<p>Player Score: <span id="Apple_score">0</span></p>
-					<p>Destroyed enemies: <span id="destroyed_enemies_score">0</span></p>
-					<p>Snake parts : <span id="Snake_Parts">0</span></p>
-					<p>Total Score : <span id="Total_Score">0</span></p>
+					<p>Apple ate :<span id="Apple_Score">0</span></p>
+					<p>Destroyed enemies:<span id="Kill_Score">0</span></p>
+					<p>Snake parts :<span id="Snake_Parts">0</span></p>
+					<p>Total Score :<span id="Total_Score">0</span></p>
 				</div>
 
 			</div>
@@ -31,9 +37,24 @@
 				<div class="enemy_projectile"></div>
 
 			</div>
+
+			<div class="Victory">
+				</p>Victory</p>
+			</div>
+
+			<div class="Defeat">
+				<p>Defeat</p>
+			</div>
 		</div>
 
-		<script src="app.js"></script>
+		<!-- setting our script type as module allow us to import modules to our file
+		Sometimes, complex projects need to split our .js file into many other files, 
+		that's make the debug and QA testing easier.
+		Marking our script as module allow us to import those files 
+		We indicate to the nav that the file has to be treated like a module, so that he can 
+		export its elements, or import anothers -->
+
+		 	<script type="module" src="Main.js"></script>
 		</body>
 	
 </html>
